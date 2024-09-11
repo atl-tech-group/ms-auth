@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: ms-auth
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgres://localhost:5432/authdb
+    username: pass
+    password: 1212
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false #DB ile ishi bitende session kill olur
+    properties:
+      hibernate:
+        show_sql: true
+server:
+  port: 8909
