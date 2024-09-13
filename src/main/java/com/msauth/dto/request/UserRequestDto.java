@@ -1,14 +1,16 @@
 package com.msauth.dto.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.msauth.enums.Role;
+import lombok.*;
+
+import java.util.Set;
 
 @Getter
 @Setter
 public class UserRequestDto {
 
-    private String firstName;
-    private String lastName;
-    private String email;
+    private String name;
+    private String userName;
     private String password;
+    private Set<Role> authorities;
 }

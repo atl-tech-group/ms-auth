@@ -3,16 +3,16 @@ spring:
     name: ms-auth
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgres://localhost:5432/authdb
-    username: pass
+    url: jdbc:postgresql://localhost:5432/authdb
+    username: postgres
     password: 1212
-
   jpa:
     hibernate:
       ddl-auto: update
-    open-in-view: false #DB ile ishi bitende session kill olur
+    open-in-view: false # DB ilə iş bitdikdə session bağlanır
     properties:
       hibernate:
         show_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 server:
   port: 8909
