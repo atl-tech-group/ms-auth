@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Verilənlərin davamlı saxlanılması üçün
+      - postgres_data:/var/lib/postgresql/data # datalari davamli saxlamaq ucun
     networks:
       - backend
 

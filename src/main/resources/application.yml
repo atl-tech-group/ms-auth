@@ -16,3 +16,11 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 server:
   port: 8909
+  servlet:
+    session:
+      timeout: 30
+
+jwt:
+  key: cn5N5rbQ1ruPW7ZEbjV6XMToIHyhG9KgHbvZedQahvjqqU3Kv9tv8X6gK289IXVXHUSVhKbjCgyny0SVOBOSg==
+  access-token-expiration: 300000
+  refresh-token-expiration: 18000000

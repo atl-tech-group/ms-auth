@@ -2,27 +2,36 @@ package com.msauth.entity;
 
 import com.msauth.enums.Role;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "users")
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String name;
+    private String email;
     private String username;
     private String password;
+
+    @Embedded
+    private Metadata metadata;
+
+    //@JsonManagedReference
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
+
 
     private boolean accountNonExpired;
     private boolean isEnabled;
