@@ -2,6 +2,7 @@ package com.msauth.service;
 
 import com.msauth.dto.request.LoginRequestDto;
 import com.msauth.dto.request.RegisterRequestDto;
+import com.msauth.dto.response.AuthResponseDto;
 import com.msauth.dto.response.LoginResponseDto;
 import com.msauth.dto.response.RegisterResponseDto;
 import com.msauth.entity.Token;
@@ -9,6 +10,7 @@ import com.msauth.entity.User;
 import com.msauth.exception.UserAlreadyExistsException;
 import com.msauth.repository.TokenRepository;
 import com.msauth.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -118,5 +120,14 @@ public class AuthService {
             // Refresh tokenin vaxti bitibse user tezeden login olunmalidir
             return new ResponseEntity<>(new LoginResponseDto(null, null, "Refresh token expired, please login again"), HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    public AuthResponseDto getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(()-> new EntityNotFoundException("User not found By "  + id + "id"));
+
+        return new AuthResponseDto(
+                user.getId()
+        );
     }
 }
