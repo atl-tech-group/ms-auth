@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import static com.msauth.enums.ErrorMessage.USER_NOT_FOUND;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -15,9 +17,9 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-
     @Override
     public UserDetails loadUserByUsername(String user) throws UsernameNotFoundException {
-        return userRepository.findByUsername(user).orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+        return userRepository.findByUsername(user)
+                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND.getMessage()));
     }
 }
