@@ -7,20 +7,24 @@ import com.msauth.dto.response.LoginResponseDto;
 import com.msauth.dto.response.RegisterResponseDto;
 import com.msauth.entity.TokenEntity;
 import com.msauth.entity.UserEntity;
+import com.msauth.enums.ErrorMessage;
 import com.msauth.exception.UserAlreadyExistsException;
 import com.msauth.repository.TokenRepository;
 import com.msauth.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.msauth.enums.ErrorMessage.*;
 import static com.msauth.mapper.TokenMapper.buildTokenEntity;
 import static com.msauth.mapper.UserMapper.USER_MAPPER;
 import static org.springframework.http.HttpStatus.OK;
@@ -76,14 +80,14 @@ public class AuthService {
             HttpServletResponse response) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return new ResponseEntity<>(UNAUTHORIZED);
+            return ResponseEntity.status(UNAUTHORIZED).build();
         }
 
         String token = authHeader.substring(7);
         String username = jwtService.extractUsername(token);
 
         UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND.getMessage()));
 
         // Refresh tokenin vaxtini yoxlayiriq
         if (jwtService.isValidRefreshToken(token, user)) {
@@ -99,16 +103,14 @@ public class AuthService {
         } else {
             // Refresh tokenin vaxti bitibse user tezeden login olunmalidir
             return ResponseEntity.status(UNAUTHORIZED).body(new LoginResponseDto
-                    (null, null, "Refresh token expired, please login again"));
+                    (null, null, EXPIRED_TOKEN.getMessage()));
         }
     }
 
     public AuthResponseDto getUserById(Long id) {
         UserEntity user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found By " + id + "id"));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_BY_ID.format(id)));
 
-        return new AuthResponseDto(user.getId());
+        return AuthResponseDto.builder().id(user.getId()).build();
     }
-
-
 }
