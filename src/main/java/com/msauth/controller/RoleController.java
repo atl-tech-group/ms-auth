@@ -17,5 +17,4 @@ public class RoleController {
     public String user() {
         return "This is User";
     }
-
 }

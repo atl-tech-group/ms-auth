@@ -27,7 +27,6 @@ public class SecurityConfig {
     private final LogoutHandler logoutHandler;
     private final UserService userService;
 
-
     private static final String[] AUTH_WHITELIST = {
             "/v3/api-docs/**",
             "/swagger-ui/**",
@@ -38,25 +37,21 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers(AUTH_WHITELIST)
-                        .permitAll()
+                        .requestMatchers(AUTH_WHITELIST).permitAll()
                         .requestMatchers("/api/v1/role/client/**").hasAnyRole("USER")
                         .requestMatchers("/api/v1/role/admin/**").hasAnyRole("ADMIN")
-                        .anyRequest()
-                        .authenticated()
+                        .anyRequest().authenticated()
                 ).userDetailsService(userService)
-
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout ->
-                        logout.logoutUrl("/api/auth/logout")
-                                .addLogoutHandler(logoutHandler)
-                                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+                        logout.logoutUrl("/api/auth/logout").addLogoutHandler(logoutHandler)
+                                .logoutSuccessHandler((request, response, authentication)
+                                        -> SecurityContextHolder.clearContext())
                 )
                 .build();
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {

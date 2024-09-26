@@ -7,7 +7,6 @@ import com.msauth.dto.response.LoginResponseDto;
 import com.msauth.dto.response.RegisterResponseDto;
 import com.msauth.exception.UserAlreadyExistsException;
 import com.msauth.service.AuthService;
-import com.msauth.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-
     private final AuthService authService;
-    private final UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponseDto> register(@RequestBody RegisterRequestDto request) throws UserAlreadyExistsException {
@@ -42,5 +39,4 @@ public class AuthController {
     public ResponseEntity<AuthResponseDto> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(authService.getUserById(id));
     }
-
 }
