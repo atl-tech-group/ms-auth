@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
-public class User implements UserDetails {
+public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,8 +30,7 @@ public class User implements UserDetails {
 
     //@JsonManagedReference
     @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
-
+    private List<TokenEntity> tokens;
 
     private boolean accountNonExpired;
     private boolean isEnabled;

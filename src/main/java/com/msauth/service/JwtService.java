@@ -1,6 +1,6 @@
 package com.msauth.service;
 
-import com.msauth.entity.User;
+import com.msauth.entity.UserEntity;
 import com.msauth.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -46,7 +46,7 @@ public class JwtService {
         return (username.equals(user.getUsername())) && !isTokenExpired(token);
     }
 
-    public boolean isValidRefreshToken(String token, User user) {
+    public boolean isValidRefreshToken(String token, UserEntity user) {
         String username = extractUsername(token);
 
         boolean validRefreshToken = tokenRepository
@@ -81,15 +81,15 @@ public class JwtService {
                 .getPayload();
     }
 
-    public String generateAccessToken(User user) {
+    public String generateAccessToken(UserEntity user) {
         return generateToken(user, accessTokenExpire);
     }
 
-    public String generateRefreshToken(User user) {
+    public String generateRefreshToken(UserEntity user) {
         return generateToken(user, refreshTokenExpire);
     }
 
-    private String generateToken(User user, long expireTime) {
+    private String generateToken(UserEntity user, long expireTime) {
         String token = Jwts
                 .builder()
                 .subject(user.getUsername())

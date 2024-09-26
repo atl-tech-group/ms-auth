@@ -35,7 +35,7 @@ public class AuthController {
         return authService.refreshToken(request, response);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<AuthResponseDto> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(authService.getUserById(id));
     }

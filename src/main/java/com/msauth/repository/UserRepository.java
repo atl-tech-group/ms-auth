@@ -1,6 +1,6 @@
 package com.msauth.repository;
 
-import com.msauth.entity.User;
+import com.msauth.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +8,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
-    Optional<User> findByUsername(String username);
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
+    Optional<UserEntity> findByEmail(String email);
+    Optional<UserEntity> findByUsername(String username);
 }

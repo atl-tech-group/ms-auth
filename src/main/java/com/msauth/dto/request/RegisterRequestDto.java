@@ -10,7 +10,7 @@ import java.util.Set;
 @Setter
 public class RegisterRequestDto {
     private String email;
-    private String userName;
+    private String username;
     private String password;
     private Set<Role> authorities;
 }

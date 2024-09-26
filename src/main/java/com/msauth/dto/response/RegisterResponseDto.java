@@ -13,6 +13,6 @@ import java.util.Set;
 public class RegisterResponseDto {
     private Long id;
     private String email;
-    private String userName;
+    private String username;
     private Set<Role> authorities;
 }
