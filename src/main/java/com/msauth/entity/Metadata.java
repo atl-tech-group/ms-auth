@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Metadata {
-
     @CreatedDate
     private LocalDateTime createdAt;
 

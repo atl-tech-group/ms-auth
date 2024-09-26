@@ -54,7 +54,6 @@ public class AuthService {
         );
     }
 
-
     public LoginResponseDto login(LoginRequestDto request) {
 
         User user = userRepository.findByUsername(request.getUserName()).orElseThrow(() -> new RuntimeException("User :" + request.getUserName() + " not Found"));
@@ -67,7 +66,6 @@ public class AuthService {
 
         return new LoginResponseDto(accessToken, refreshToken, "User login was successful");
     }
-
 
     private void revokeAllTokenByUser(User user) {
         List<Token> validTokens = tokenRepository.findAllAccessTokensByUser(user.getId());
@@ -90,7 +88,6 @@ public class AuthService {
         token.setUser(user);
         tokenRepository.save(token);
     }
-
 
     public ResponseEntity<LoginResponseDto> refreshToken(
             HttpServletRequest request,

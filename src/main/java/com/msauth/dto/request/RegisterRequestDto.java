@@ -13,5 +13,4 @@ public class RegisterRequestDto {
     private String userName;
     private String password;
     private Set<Role> authorities;
-
 }

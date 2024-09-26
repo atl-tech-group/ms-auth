@@ -43,6 +43,4 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Set<Role> authorities;
-
-
 }
