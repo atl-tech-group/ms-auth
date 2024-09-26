@@ -14,8 +14,9 @@ spring:
       hibernate:
         show_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
 server:
-  port: 0 #8909
+  port: 9092
   servlet:
     session:
       timeout: 30

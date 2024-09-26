@@ -2,6 +2,7 @@ package com.msauth.controller;
 
 import com.msauth.dto.request.LoginRequestDto;
 import com.msauth.dto.request.RegisterRequestDto;
+import com.msauth.dto.response.AuthResponseDto;
 import com.msauth.dto.response.LoginResponseDto;
 import com.msauth.dto.response.RegisterResponseDto;
 import com.msauth.exception.UserAlreadyExistsException;
@@ -35,6 +36,11 @@ public class AuthController {
     @PostMapping("/refresh_token")
     public ResponseEntity<LoginResponseDto> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         return authService.refreshToken(request, response);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<AuthResponseDto> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(authService.getUserById(id));
     }
 
 }
