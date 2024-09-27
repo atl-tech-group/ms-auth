@@ -31,3 +31,6 @@ jwt:
   access-token-expiration: 300000
   refresh-token-expiration: 18000000
 
+logging:
+  level:
+    org.springframework.security: trace
