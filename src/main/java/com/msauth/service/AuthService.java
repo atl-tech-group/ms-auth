@@ -7,17 +7,16 @@ import com.msauth.dto.response.LoginResponseDto;
 import com.msauth.dto.response.RegisterResponseDto;
 import com.msauth.entity.TokenEntity;
 import com.msauth.entity.UserEntity;
-import com.msauth.enums.ErrorMessage;
 import com.msauth.exception.UserAlreadyExistsException;
 import com.msauth.repository.TokenRepository;
 import com.msauth.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +26,7 @@ import java.util.List;
 import static com.msauth.enums.ErrorMessage.*;
 import static com.msauth.mapper.TokenMapper.buildTokenEntity;
 import static com.msauth.mapper.UserMapper.USER_MAPPER;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
@@ -38,6 +38,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
+    private final AuthenticationManager authenticationManager;
+
 
     public RegisterResponseDto register(RegisterRequestDto request) throws UserAlreadyExistsException {
         var user1 = userRepository.findByEmail(request.getEmail());
@@ -52,14 +54,24 @@ public class AuthService {
     }
 
     public LoginResponseDto login(LoginRequestDto request) {
-        var user = userRepository.findByUsername(request.getUserName())
-                .orElseThrow(() -> new RuntimeException("User :" + request.getUserName() + " not Found"));
 
-        String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-        saveUserToken(accessToken, refreshToken, user);
+        var authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()
+                )
+        );
 
-        return new LoginResponseDto(accessToken, refreshToken, "User login was successful");
+        if (authentication.isAuthenticated()) {
+            var user = (UserEntity) authentication.getPrincipal();
+            String accessToken = jwtService.generateAccessToken(user);
+            String refreshToken = jwtService.generateRefreshToken(user);
+            saveUserToken(accessToken, refreshToken, user);
+
+            return new LoginResponseDto(accessToken, refreshToken, "User login was successful");
+        }
+
+        throw new UsernameNotFoundException(USER_NOT_FOUND.format(request.getUsername()));
     }
 
     private void revokeAllTokenByUser(UserEntity user) {
@@ -78,7 +90,7 @@ public class AuthService {
     public ResponseEntity<LoginResponseDto> refreshToken(
             HttpServletRequest request,
             HttpServletResponse response) {
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String authHeader = request.getHeader(AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(UNAUTHORIZED).build();
         }
