@@ -29,7 +29,7 @@ public class TokenEntity {
     private boolean loggedOut;
 
     @Enumerated(EnumType.STRING)
-    public TokenType tokenType = TokenType.BEARER;
+    public TokenType tokenType;
 
     public boolean revoked;
     public boolean expired;
