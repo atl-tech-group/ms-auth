@@ -23,8 +23,6 @@ public class PasswordEncoderConfig {
         return new BCryptPasswordEncoder();
     }
 
-    //TODO testing
-
     @Bean
     UserDetailsService userDetailsService() {
         return username -> userRepository.findByUsername(username)

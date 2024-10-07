@@ -1,5 +1,6 @@
 package com.msauth.config;
 
+import com.msauth.exception.CustomAccessDeniedFilter;
 import com.msauth.security.JwtAuthFilter;
 import com.msauth.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,8 @@ public class SecurityConfig {
     private final LogoutHandler logoutHandler;
     private final UserService userService;
     private final AuthenticationProvider authenticationProvider;
+    private final CustomAccessDeniedFilter customAccessDeniedFilter;
+
 
     private static final String[] AUTH_WHITELIST = {
             "/v3/api-docs/**",
@@ -43,6 +46,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/role/client/**").hasAnyRole("USER")
                         .requestMatchers("/api/v1/role/admin/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(e ->
+                        e.accessDeniedHandler(customAccessDeniedFilter)
                 )
                 .authenticationProvider(authenticationProvider)
                 .userDetailsService(userService)
