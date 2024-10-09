@@ -1,6 +1,7 @@
 package com.msauth.service;
 
 import com.msauth.entity.UserEntity;
+import com.msauth.enums.Role;
 import com.msauth.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -14,7 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -82,16 +84,21 @@ public class JwtService {
     }
 
     public String generateAccessToken(UserEntity user) {
-        return generateToken(user, accessTokenExpire);
+        Map<String, Object> extraClaims = new HashMap<>();
+        List<String> roles = user.getAuthorities().stream().map(Enum::name).toList();
+        extraClaims.put("roles", roles);
+
+        return generateToken(user, accessTokenExpire, extraClaims);
     }
 
     public String generateRefreshToken(UserEntity user) {
-        return generateToken(user, refreshTokenExpire);
+        return generateToken(user, refreshTokenExpire, null);
     }
 
-    private String generateToken(UserEntity user, long expireTime) {
+    private String generateToken(UserEntity user, long expireTime, Map<String, Object> extraClaims) {
         String token = Jwts
                 .builder()
+                .claims(extraClaims)
                 .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expireTime))
