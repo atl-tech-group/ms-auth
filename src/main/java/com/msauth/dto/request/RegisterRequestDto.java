@@ -1,12 +1,10 @@
 package com.msauth.dto.request;
 
 import com.msauth.enums.Role;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -31,6 +29,9 @@ public class RegisterRequestDto {
                     "and one special character (@#$%^&+=)"
     )
     private String password;
+
+    @NotNull(message = "Date of birth is required.")
+    private LocalDate dateOfBirth;
 
     private Set<Role> authorities;
 }

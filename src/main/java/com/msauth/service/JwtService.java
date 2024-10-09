@@ -1,7 +1,6 @@
 package com.msauth.service;
 
 import com.msauth.entity.UserEntity;
-import com.msauth.enums.Role;
 import com.msauth.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
