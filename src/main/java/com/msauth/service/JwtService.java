@@ -71,7 +71,6 @@ public class JwtService {
         return resolver.apply(claims);
     }
 
-
     private Claims extractAllClaims(String token) {
         return Jwts
                 .parser()
@@ -102,7 +101,6 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + expireTime))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
-
         return token;
     }
 

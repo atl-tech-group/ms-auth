@@ -1,5 +1,6 @@
 package com.msauth.service;
 
+import com.msauth.config.properties.UserCreatedTopicProperties;
 import com.msauth.dto.request.LoginRequestDto;
 import com.msauth.dto.request.RegisterRequestDto;
 import com.msauth.dto.response.AuthResponseDto;
@@ -7,7 +8,9 @@ import com.msauth.dto.response.LoginResponseDto;
 import com.msauth.dto.response.RegisterResponseDto;
 import com.msauth.entity.TokenEntity;
 import com.msauth.entity.UserEntity;
+import com.msauth.events.UserCreatedEvent;
 import com.msauth.exception.UserAlreadyExistsException;
+import com.msauth.producer.KafkaProducer;
 import com.msauth.repository.TokenRepository;
 import com.msauth.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,13 +18,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.msauth.enums.ErrorMessage.*;
 import static com.msauth.mapper.TokenMapper.buildTokenEntity;
@@ -29,6 +35,8 @@ import static com.msauth.mapper.UserMapper.USER_MAPPER;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.kafka.support.KafkaHeaders.KEY;
+import static org.springframework.kafka.support.KafkaHeaders.TOPIC;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +47,8 @@ public class AuthService {
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
     private final AuthenticationManager authenticationManager;
+    private final KafkaProducer kafkaProducer;
+    private final UserCreatedTopicProperties userCreatedTopicProperties;
 
 
     public RegisterResponseDto register(RegisterRequestDto request) throws UserAlreadyExistsException {
@@ -50,6 +60,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user = userRepository.save(user);
 
+        sendUserCreatedEvent(user);
         return USER_MAPPER.buildRegisterResponseDto(user);
     }
 
@@ -72,19 +83,6 @@ public class AuthService {
         }
 
         throw new UsernameNotFoundException(USER_NOT_FOUND.format(request.getUsername()));
-    }
-
-    private void revokeAllTokenByUser(UserEntity user) {
-        List<TokenEntity> validTokens = tokenRepository.findAllAccessTokensByUser(user.getId());
-        if (validTokens.isEmpty()) return;
-        validTokens.forEach(t -> t.setLoggedOut(true));
-
-        tokenRepository.saveAll(validTokens);
-    }
-
-    private void saveUserToken(String accessToken, String refreshToken, UserEntity user) {
-        var token = buildTokenEntity(accessToken, refreshToken, user);
-        tokenRepository.save(token);
     }
 
     public ResponseEntity<LoginResponseDto> refreshToken(
@@ -124,5 +122,33 @@ public class AuthService {
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_BY_ID.format(id)));
 
         return AuthResponseDto.builder().id(user.getId()).build();
+    }
+
+    private void revokeAllTokenByUser(UserEntity user) {
+        List<TokenEntity> validTokens = tokenRepository.findAllAccessTokensByUser(user.getId());
+        if (validTokens.isEmpty()) return;
+        validTokens.forEach(t -> t.setLoggedOut(true));
+
+        tokenRepository.saveAll(validTokens);
+    }
+
+    private void saveUserToken(String accessToken, String refreshToken, UserEntity user) {
+        var token = buildTokenEntity(accessToken, refreshToken, user);
+        tokenRepository.save(token);
+    }
+
+    private void sendUserCreatedEvent(UserEntity user) {
+        UserCreatedEvent event = UserCreatedEvent.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .dateOfBirth(user.getDateOfBirth())
+                .status(true)
+                .build();
+
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(TOPIC, userCreatedTopicProperties.getTopicName());
+        headers.put(KEY, user.getId().toString());
+
+        kafkaProducer.sendMessage(new GenericMessage<>(event, headers));
     }
 }
