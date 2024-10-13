@@ -5,7 +5,7 @@ RUN gradle build --no-daemon -x test
 
 FROM openjdk:17-slim
 
-EXPOSE 9092
+EXPOSE 9096
 
 RUN mkdir /app
 

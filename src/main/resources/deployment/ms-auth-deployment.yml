@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-auth
+  template:
+    metadata:
+      labels:
+        app: ms-auth
+    spec:
+      containers:
+        - name: ms-auth
+          image: ms-auth
+          ports:
+            - containerPort: 9096
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-service:5432/authdb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: pass
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1212"
+
