@@ -22,7 +22,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://<?>:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
 
 kafka:
   host: kafka-service:9092
