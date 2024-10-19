@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/authdb
+    username: pass
+    password: 1212
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false # DB ilə iş bitdikdə session bağlanır
+    properties:
+      hibernate:
+        show_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 9096
+  servlet:
+    session:
+      timeout: 30
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+kafka:
+  host: localhost:9092
+  topics:
+    user-created:
+      topicName: ${spring.application.name}.user_created.1
+      partitionCount: 1
+      replicationFactor: 1
+      retentionInMs: 604800000
+
+jwt:
+  key: cn5N5rbQ1ruPW7ZEbjV6XMToIHyhG9KgHbvZedQahvjqqU3Kv9tv8X6gK289IXVXHUSVhKbjCgyny0SVOBOSg==
+  access-token-expiration: 300000
+  refresh-token-expiration: 18000000
