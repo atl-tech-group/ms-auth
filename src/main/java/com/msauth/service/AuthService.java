@@ -17,6 +17,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -51,6 +53,7 @@ public class AuthService {
     private final UserCreatedTopicProperties userCreatedTopicProperties;
 
 
+    @CachePut(cacheNames = "user", key = " 'registerUser' + #result.id", unless = "#result == null")
     public RegisterResponseDto register(RegisterRequestDto request) throws UserAlreadyExistsException {
         var user1 = userRepository.findByEmail(request.getEmail());
         if (user1.isPresent())
@@ -117,6 +120,7 @@ public class AuthService {
         }
     }
 
+    @Cacheable(cacheNames = "user", key = "#id")
     public AuthResponseDto getUserById(Long id) {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_BY_ID.format(id)));
