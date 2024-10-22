@@ -13,6 +13,24 @@ spring:
         show_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 10000
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 8
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 30
+      cache-null-values: false
+
 server:
   port: 9096
   servlet:
@@ -32,6 +50,7 @@ kafka:
       partitionCount: 1
       replicationFactor: 1
       retentionInMs: 604800000
+
 
 jwt:
   key: cn5N5rbQ1ruPW7ZEbjV6XMToIHyhG9KgHbvZedQahvjqqU3Kv9tv8X6gK289IXVXHUSVhKbjCgyny0SVOBOSg==
